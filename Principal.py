@@ -12,6 +12,7 @@ import numpy as np
 import ctypes
 from openpyxl.drawing.image import Image  # Para insertar imágenes en Excel
 
+from DesingSPT.Test import calcular_puntos_triangulo
 
 myappid = 'mycompay.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -54,7 +55,7 @@ tk.Label(Infor_proyecto_frame, text="Tensión Primario: ").grid(row=1, column=0,
 tk.Label(Infor_proyecto_frame, text="Tensión Secundario: ").grid(row=2, column=0, sticky="e")
 tk.Label(Infor_proyecto_frame, text="Potencia Nominal:").grid(row=3, column=0, sticky="e")
 
-titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="")
+titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="Proyecto 1")
 tension_primario_val = tk.Label(Infor_proyecto_frame, text="")
 tension_secundario_val = tk.Label(Infor_proyecto_frame, text="")
 potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="")
@@ -70,18 +71,21 @@ Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=5)
 canvas_2d_3d = tk.Frame(Columna_2,pady=5,padx=5)
 canvas_2d_3d.grid(row=0, column=0, padx=5, pady=5, rowspan=7, columnspan=2)
 
+#profundidad de 0.5 a 1.5,
 Resistencia_frame = tk.LabelFrame(Columna_3, text="Resistencia",pady=5,padx=5)
 Resistencia_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2)
 
+#
 Seguridad_frame = tk.LabelFrame(Columna_3, text="Seguridad",pady=5,padx=5)
 Seguridad_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=2)
 
+#
 Default_frame = tk.LabelFrame(Columna_3, text="Default",pady=5,padx=5)
 Default_frame.grid(row=4, column=0, padx=5, pady=5, rowspan=2)
 
+#
 boton_Calcular_frame = tk.Frame(Columna_3, pady=5, padx=5)
 boton_Calcular_frame.grid(row=6, column=0, padx=5, pady=5)
-
 
 
 class ExcelManager:
@@ -757,7 +761,7 @@ def abrir_datos_proyecto():
 
 
     # Función para limpiar los datos ingresados
-    def limpiar_datos():
+    def limpiar_datos(estado_imagen=None, estado_circulo=None, indicador=None):
         for entry in entradas.values():
             entry.delete(0, tk.END)
         combo_provincia.set("")

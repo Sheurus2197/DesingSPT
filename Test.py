@@ -54,7 +54,7 @@ tk.Label(Infor_proyecto_frame, text="Tensión Primario: ").grid(row=1, column=0,
 tk.Label(Infor_proyecto_frame, text="Tensión Secundario: ").grid(row=2, column=0, sticky="e")
 tk.Label(Infor_proyecto_frame, text="Potencia Nominal:").grid(row=3, column=0, sticky="e")
 
-titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="")
+titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="Proyecto 1")
 tension_primario_val = tk.Label(Infor_proyecto_frame, text="")
 tension_secundario_val = tk.Label(Infor_proyecto_frame, text="")
 potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="")
@@ -65,7 +65,14 @@ tension_secundario_val.grid(row=2, column=1, sticky="w")
 potencia_nominal_val.grid(row=3, column=1, sticky="w")
 
 Objetivo_frame = tk.LabelFrame(Columna_1, text="Objetivos",pady=5,padx=5)
-Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=5)
+Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=13)
+tk.Label(Objetivo_frame, text="Objetivo 1: ").grid(row=0, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 2: ").grid(row=1, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 3: ").grid(row=2, column=0, sticky="e")
+
+
+titulo_proyecto_val.grid(row=0, column=1, sticky="w")
+
 
 canvas_2d_3d = tk.Frame(Columna_2,pady=5,padx=5)
 canvas_2d_3d.grid(row=0, column=0, padx=5, pady=5, rowspan=7, columnspan=2)
@@ -758,7 +765,7 @@ def abrir_datos_proyecto():
 
 
     # Función para limpiar los datos ingresados
-    def limpiar_datos():
+    def limpiar_datos(estado_imagen=None, estado_circulo=None, indicador=None):
         for entry in entradas.values():
             entry.delete(0, tk.END)
         combo_provincia.set("")
@@ -1776,6 +1783,11 @@ def abrir_datos_conductor():
     cargar_datos_conductor()
 
 puntos_rojos = []  # Lista para almacenar los puntos seleccionados como varillas
+
+
+def calcular_puntos_triangulo(puntos_originales, num_reticulas):
+    pass
+
 
 def abrir_diseno_malla_spt():
     # Crear la ventana para el diseño de malla SPT

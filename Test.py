@@ -164,11 +164,11 @@ objetivo13_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo13_var, st
 objetivo13_checkbox.grid(row=12, column=1, sticky="w")
 
 # Frame Resistencia
-Resistencia_frame = tk.LabelFrame(Columna_3, text="Resistencia", pady=5, padx=5)
-Resistencia_frame.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+Resistencia_frame = tk.LabelFrame(Columna_3, text="Resistencia", pady=5, padx=5, font=("Arial", 14))
+Resistencia_frame.grid(row=0, column=0, padx=5, pady=5, sticky="e")
 
 # Campos dentro del Frame Resistencia
-tk.Label(Resistencia_frame, text="Profundidad:").grid(row=0, column=0, sticky="e")
+tk.Label(Resistencia_frame, text="Profundidad:", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
 profundidad_spinbox = tk.Spinbox(Resistencia_frame, from_=0.5, to=1.5, increment=0.1, width=5)
 profundidad_spinbox.grid(row=0, column=1, sticky="w")
 profundidad_spinbox.delete(0, "end")  # Borrar el valor actual
@@ -199,6 +199,23 @@ tk.Label(Resistencia_frame, text="Resistividad:").grid(row=1, column=0, sticky="
 lista_resistividad = ttk.Combobox(Resistencia_frame, state="readonly", width=15)
 lista_resistividad.grid(row=1, column=1, sticky="w")
 
+def actualizar_lista_desplegable():
+    # Obtener la lista de rutas disponibles (que tienen datos válidos)
+    rutas_validas = [perfil for perfil, datos in rutas.items() if any(datos.values())]
+
+    # Limpiar la lista desplegable
+    lista_resistividad.delete(0, "end")
+
+    # Agregar las rutas a la lista desplegable
+    for ruta in rutas_validas:
+        lista_resistividad.insert("end", ruta)
+
+def on_ruta_seleccionada(event):
+    encabezado_seleccionado = lista_resistividad.get()
+    calcular_resistividad_con_profundidad(encabezado_seleccionado)
+
+# Asumir que lista_desplegable es el widget de la lista desplegable
+lista_resistividad.bind("<<ComboboxSelected>>", on_ruta_seleccionada)
 
 def actualizar_resistividad_seleccionada(event):
     """
@@ -1054,6 +1071,12 @@ def abrir_datos_proyecto():
     tk.Button(frame_botones, text="Cancelar", command=ventana_datos.destroy, pady=5, padx=10).grid(row=0, column=2)
 
 
+# Diccionario global para almacenar las rutas con datos válidos
+rutas = {}
+
+# Función para abrir la ventana "Datos de Resistencia"
+# Función para abrir la ventana "Datos de Resistencia"
+# Función para abrir la ventana "Datos de Resistencia"
 # Función para abrir la ventana "Datos de Resistencia"
 def abrir_datos_resistencia():
     ventana = tk.Toplevel(root)
@@ -1342,7 +1365,6 @@ def abrir_datos_resistencia():
     # Botón para guardar los datos en el Excel
     btn_guardar = tk.Button(ventana, text="Guardar", command=guardar_datos_resistencia)
     btn_guardar.grid(row=5, column=0, columnspan=5, pady=10)
-
 
 def abrir_datos_transformador():
     if not manager.archivo_cargado():
@@ -3008,11 +3030,11 @@ def calcular_resistividad_con_profundidad(encabezado_seleccionado=None):
             print("No se encontró un valor para la Longitud total de varillas (Lv).")
             return
         Lv_metros = float(Lv) / 100  # Convertir a metros
-        print(f"Longitud total del varillas (Lv): {Lv_metros:.2f} m")
+        print(f"Longitud total de varillas (Lv): {Lv_metros:.2f} m")
 
         Nv = diseño_malla_sheet.cell(row=2, column=3).value  # Columna 3: Número de Varillas
         if Nv is None:
-            print("No se encontró un valor para la Longitud total de varillas (Lv).")
+            print("No se encontró un valor para el Número de varillas (Nv).")
             return
         Nv = float(Nv)
         print(f"Número de varillas: {Nv}")

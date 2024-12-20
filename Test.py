@@ -11,10 +11,8 @@ import numpy as np
 import ctypes
 from openpyxl.drawing.image import Image  # Para insertar imágenes en Excel
 
-
 myappid = 'mycompay.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
 
 # Crear la ventana principal
 root = tk.Tk()
@@ -22,7 +20,7 @@ root.title("DesingSPT")
 
 # Obtener las dimensiones de la pantalla
 screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()-80
+screen_height = root.winfo_screenheight() - 80
 
 # Establecer la geometría de la ventana al tamaño de la pantalla
 root.geometry(f"{screen_width}x{screen_height}")
@@ -33,137 +31,209 @@ root.iconbitmap('icon.ico')
 main_frame = tk.Frame(root)
 main_frame.pack(fill="both", expand=True)
 
+# Configurar columnas para que se expandan correctamente (tamaño relativo)
+main_frame.grid_columnconfigure(0, weight=1)  # Columna 1
+main_frame.grid_columnconfigure(1, weight=4)  # Columna 2 (más ancha, aumentar el peso)
+main_frame.grid_columnconfigure(5, weight=1)  # Columna 3
+
+# Configurar filas para que se expandan correctamente (tamaño relativo)
+main_frame.grid_rowconfigure(0, weight=1)  # Fila 0 (ajustar si hay más filas)
+
 # Frame para la primera columna
 Columna_1 = tk.Frame(main_frame)
-Columna_1.grid(row=0, column=0,padx=5, pady=5)
+Columna_1.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 # Frame para la segunda columna
 Columna_2 = tk.Frame(main_frame)
-Columna_2.grid(row=0, column=1, padx=5, pady=5)
+Columna_2.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
 
-# Frame para la segunda columna (resistividad_canvas)
+# Frame para la tercera columna (resistividad_canvas)
 Columna_3 = tk.Frame(main_frame)
-Columna_3.grid(row=0, column=2, padx=5, pady=5)
+Columna_3.grid(row=0, column=5, padx=5, pady=5, sticky="nsew")
+
+# Frame para el canvas dentro de la columna 2 (que se expanda en todas las direcciones)
+canvas_2d_3d = tk.Frame(Columna_2, pady=5, padx=5)
+canvas_2d_3d.grid(row=0, column=0, padx=5, pady=5, rowspan=7, columnspan=2, sticky="nsew")
+
+# Agregar un canvas dentro de ese frame
+canvas = tk.Canvas(canvas_2d_3d, bg="lightgray")
+canvas.pack(fill="both", expand=True)  # Asegura que el canvas ocupe todo el espacio disponible
 
 #Frame de proyecto
-Infor_proyecto_frame = tk.LabelFrame(Columna_1, text="Información del Proyecto",pady=5,padx=5, font=("Arial", 14))
+Infor_proyecto_frame = tk.LabelFrame(Columna_1, text="Información del Proyecto", pady=5, padx=5, font=("Arial", 14))
 Infor_proyecto_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2, sticky="w")
-tk.Label(Infor_proyecto_frame, text="Título del proyecto: ").grid(row=0, column=0, sticky="e")
-tk.Label(Infor_proyecto_frame, text="Tensión Primario: ").grid(row=1, column=0, sticky="e")
-tk.Label(Infor_proyecto_frame, text="Tensión Secundario: ").grid(row=2, column=0, sticky="e")
-tk.Label(Infor_proyecto_frame, text="Potencia Nominal:").grid(row=3, column=0, sticky="e")
 
-titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="Proyecto 1")
+tk.Label(Infor_proyecto_frame, text="Título del proyecto: ", font=("Arial", 12)).grid(row=0, column=0, sticky="e",
+                                                                                      pady=5)
+titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="Proyecto 1", font=("Arial", 12))
 titulo_proyecto_val.grid(row=0, column=1, sticky="w")
 
-tension_primario_val = tk.Label(Infor_proyecto_frame, text="")
+tk.Label(Infor_proyecto_frame, text="Tensión Primario: ", font=("Arial", 12)).grid(row=1, column=0, sticky="e", pady=5)
+tension_primario_val = tk.Label(Infor_proyecto_frame, text="", font=("Arial", 12))
 tension_primario_val.grid(row=1, column=1, sticky="w")
 
-tension_secundario_val = tk.Label(Infor_proyecto_frame, text="")
+tk.Label(Infor_proyecto_frame, text="Tensión Secundario: ", font=("Arial", 12)).grid(row=2, column=0, sticky="e",
+                                                                                     pady=5)
+tension_secundario_val = tk.Label(Infor_proyecto_frame, text="", font=("Arial", 12))
 tension_secundario_val.grid(row=2, column=1, sticky="w")
 
-potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="")
+tk.Label(Infor_proyecto_frame, text="Potencia Nominal:", font=("Arial", 12)).grid(row=3, column=0, sticky="e", pady=5)
+potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="", font=("Arial", 12))
 potencia_nominal_val.grid(row=3, column=1, sticky="w")
 
 # Frame de objetivos
-Objetivo_frame = tk.LabelFrame(Columna_1, text="Objetivos", pady=5, padx=5, font=("Arial", 14))
+Objetivo_frame = tk.LabelFrame(Columna_1, text="Objetivos", pady=6, padx=5, font=("Arial", 14))
 Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, sticky="w")  # Alineado a la izquierda
 
 # Objetivo 1
-tk.Label(Objetivo_frame, text="Objetivo 1:", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 1:", font=("Arial", 12)).grid(row=0, column=0, sticky="e", pady=5)
 objetivo1_var = tk.BooleanVar(value=False)
 objetivo1_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo1_var, state="disabled")
 objetivo1_checkbox.grid(row=0, column=1, sticky="w")
 
 # Objetivo 2
-tk.Label(Objetivo_frame, text="Objetivo 2:", font=("Arial", 12)).grid(row=1, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 2:", font=("Arial", 12)).grid(row=1, column=0, sticky="e", pady=5)
 objetivo2_var = tk.BooleanVar(value=False)
 objetivo2_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo2_var, state="disabled")
 objetivo2_checkbox.grid(row=1, column=1, sticky="w")
 
 # Objetivo 3
-tk.Label(Objetivo_frame, text="Objetivo 3:", font=("Arial", 12)).grid(row=2, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 3:", font=("Arial", 12)).grid(row=2, column=0, sticky="e", pady=5)
 objetivo3_var = tk.BooleanVar(value=False)
 objetivo3_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo3_var, state="disabled")
 objetivo3_checkbox.grid(row=2, column=1, sticky="w")
 
 # Objetivo 4
-tk.Label(Objetivo_frame, text="Objetivo 4:", font=("Arial", 12)).grid(row=3, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 4:", font=("Arial", 12)).grid(row=3, column=0, sticky="e", pady=5)
 objetivo4_var = tk.BooleanVar(value=False)
 objetivo4_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo4_var, state="disabled")
 objetivo4_checkbox.grid(row=3, column=1, sticky="w")
 
 # Objetivo 5
-tk.Label(Objetivo_frame, text="Objetivo 5:", font=("Arial", 12)).grid(row=4, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 5:", font=("Arial", 12)).grid(row=4, column=0, sticky="e", pady=5)
 objetivo5_var = tk.BooleanVar(value=False)
 objetivo5_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo5_var, state="disabled")
 objetivo5_checkbox.grid(row=4, column=1, sticky="w")
 
 # Objetivo 6
-tk.Label(Objetivo_frame, text="Objetivo 6:", font=("Arial", 12)).grid(row=5, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 6:", font=("Arial", 12)).grid(row=5, column=0, sticky="e", pady=5)
 objetivo6_var = tk.BooleanVar(value=False)
 objetivo6_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo6_var, state="disabled")
 objetivo6_checkbox.grid(row=5, column=1, sticky="w")
 
 # Objetivo 7
-tk.Label(Objetivo_frame, text="Objetivo 7:", font=("Arial", 12)).grid(row=6, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 7:", font=("Arial", 12)).grid(row=6, column=0, sticky="e", pady=5)
 objetivo7_var = tk.BooleanVar(value=False)
 objetivo7_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo7_var, state="disabled")
 objetivo7_checkbox.grid(row=6, column=1, sticky="w")
 
 # Objetivo 8
-tk.Label(Objetivo_frame, text="Objetivo 8:", font=("Arial", 12)).grid(row=7, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 8:", font=("Arial", 12)).grid(row=7, column=0, sticky="e", pady=5)
 objetivo8_var = tk.BooleanVar(value=False)
 objetivo8_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo8_var, state="disabled")
 objetivo8_checkbox.grid(row=7, column=1, sticky="w")
 
 # Objetivo 9
-tk.Label(Objetivo_frame, text="Objetivo 9:", font=("Arial", 12)).grid(row=8, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 9:", font=("Arial", 12)).grid(row=8, column=0, sticky="e", pady=5)
 objetivo9_var = tk.BooleanVar(value=False)
 objetivo9_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo9_var, state="disabled")
 objetivo9_checkbox.grid(row=8, column=1, sticky="w")
 
 # Objetivo 10
-tk.Label(Objetivo_frame, text="Objetivo 10:", font=("Arial", 12)).grid(row=9, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 10:", font=("Arial", 12)).grid(row=9, column=0, sticky="e", pady=5)
 objetivo10_var = tk.BooleanVar(value=False)
 objetivo10_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo10_var, state="disabled")
 objetivo10_checkbox.grid(row=9, column=1, sticky="w")
 
 # Objetivo 11
-tk.Label(Objetivo_frame, text="Objetivo 11:", font=("Arial", 12)).grid(row=10, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 11:", font=("Arial", 12)).grid(row=10, column=0, sticky="e", pady=5)
 objetivo11_var = tk.BooleanVar(value=False)
 objetivo11_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo11_var, state="disabled")
 objetivo11_checkbox.grid(row=10, column=1, sticky="w")
 
 # Objetivo 12
-tk.Label(Objetivo_frame, text="Objetivo 12:", font=("Arial", 12)).grid(row=11, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 12:", font=("Arial", 12)).grid(row=11, column=0, sticky="e", pady=5)
 objetivo12_var = tk.BooleanVar(value=False)
 objetivo12_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo12_var, state="disabled")
 objetivo12_checkbox.grid(row=11, column=1, sticky="w")
 
 # Objetivo 13
-tk.Label(Objetivo_frame, text="Objetivo 13:", font=("Arial", 12)).grid(row=12, column=0, sticky="e")
+tk.Label(Objetivo_frame, text="Objetivo 13:", font=("Arial", 12)).grid(row=12, column=0, sticky="e", pady=5)
 objetivo13_var = tk.BooleanVar(value=False)
 objetivo13_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo13_var, state="disabled")
 objetivo13_checkbox.grid(row=12, column=1, sticky="w")
 
+# Frame Resistencia
+Resistencia_frame = tk.LabelFrame(Columna_3, text="Resistencia", pady=5, padx=5)
+Resistencia_frame.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+
+# Campos dentro del Frame Resistencia
+tk.Label(Resistencia_frame, text="Profundidad:").grid(row=0, column=0, sticky="e")
+profundidad_spinbox = tk.Spinbox(Resistencia_frame, from_=0.5, to=1.5, increment=0.1, width=5)
+profundidad_spinbox.grid(row=0, column=1, sticky="w")
+profundidad_spinbox.delete(0, "end")  # Borrar el valor actual
+profundidad_spinbox.insert(0, "0.5")  # Insertar el valor por defecto
 
 
-canvas_2d_3d = tk.Frame(Columna_2,pady=5,padx=5)
-canvas_2d_3d.grid(row=0, column=0, padx=5, pady=5, rowspan=7, columnspan=2)
+def actualizar_resistividad_seleccionada(event):
+    """
+    Evento que se activa al seleccionar un valor en la lista desplegable de resistividad.
+    Llama a la función calcular_resistividad_con_profundidad con el valor seleccionado.
+    """
+    encabezado_seleccionado = lista_resistividad.get()  # Obtener el valor seleccionado
+    print(f"Encabezado seleccionado: {encabezado_seleccionado}")
+    calcular_resistividad_con_profundidad(encabezado_seleccionado)
 
-Resistencia_frame = tk.LabelFrame(Columna_3, text="Resistencia",pady=5,padx=5)
-Resistencia_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2)
 
-Seguridad_frame = tk.LabelFrame(Columna_3, text="Seguridad",pady=5,padx=5)
-Seguridad_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=2)
+tk.Label(Resistencia_frame, text="Resistividad:").grid(row=1, column=0, sticky="e")
+# Lista desplegable para resistividad
+lista_resistividad = ttk.Combobox(Resistencia_frame, state="readonly", width=15)
+lista_resistividad.grid(row=1, column=1, sticky="w")
+lista_resistividad.bind("<<ComboboxSelected>>", actualizar_resistividad_seleccionada)
 
-Default_frame = tk.LabelFrame(Columna_3, text="Default",pady=5,padx=5)
-Default_frame.grid(row=4, column=0, padx=5, pady=5, rowspan=2)
 
-boton_Calcular_frame = tk.Frame(Columna_3, pady=5, padx=5)
-boton_Calcular_frame.grid(row=6, column=0, padx=5, pady=5)
+# Inicialización del frame de resistividad y sus elementos
+tk.Label(Resistencia_frame, text="Resistividad:").grid(row=1, column=0, sticky="e")
 
+# Lista desplegable para resistividad
+lista_resistividad = ttk.Combobox(Resistencia_frame, state="readonly", width=15)
+lista_resistividad.grid(row=1, column=1, sticky="w")
+
+
+def actualizar_resistividad_seleccionada(event):
+    """
+    Evento que se activa al seleccionar un valor en la lista desplegable de resistividad.
+    Llama a la función calcular_resistividad_con_profundidad con el valor seleccionado.
+    """
+    seleccion = lista_resistividad.get()
+    print(f"Encabezado seleccionado: {seleccion}")
+    calcular_resistividad_con_profundidad(seleccion)
+
+# Asociar el evento de selección a la lista desplegable
+lista_resistividad.bind("<<ComboboxSelected>>", actualizar_resistividad_seleccionada)
+
+tk.Label(Resistencia_frame, text="Resistencia Malla:").grid(row=2, column=0, sticky="e")
+tk.Entry(Resistencia_frame).grid(row=2, column=1, sticky="w")
+
+# Frame Seguridad
+Seguridad_frame = tk.LabelFrame(Columna_3, text="Seguridad", pady=5, padx=5)
+Seguridad_frame.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+
+# Campos dentro del Frame Seguridad
+tk.Label(Seguridad_frame, text="GPR:").grid(row=0, column=0, sticky="e")
+tk.Entry(Seguridad_frame).grid(row=0, column=1, sticky="w")
+tk.Label(Seguridad_frame, text="Tensión de paso:").grid(row=1, column=0, sticky="e")
+tk.Entry(Seguridad_frame).grid(row=1, column=1, sticky="w")
+tk.Label(Seguridad_frame, text="Tensión de toque:").grid(row=2, column=0, sticky="e")
+tk.Entry(Seguridad_frame).grid(row=2, column=1, sticky="w")
+
+# Frame Default (Sugerencias)
+Default_frame = tk.LabelFrame(Columna_3, text="Sugerencias", pady=5, padx=5)
+Default_frame.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+
+# Campo dentro del Frame Default (Este será no editable)
+tk.Label(Default_frame, text="Texto sugerencia:").grid(row=0, column=0, sticky="e")
+tk.Label(Default_frame, text="Este es un texto no editable.").grid(row=0, column=1, sticky="w")
 
 
 class ExcelManager:
@@ -239,6 +309,45 @@ class ExcelManager:
 
 manager = ExcelManager()
 
+def cargar_encabezados_validos():
+    """
+    Carga los encabezados válidos desde la hoja 'Resistencias' del archivo Excel
+    y los asigna a la lista desplegable de resistividad.
+    """
+    if not manager.archivo_cargado():
+        print("No hay ningún archivo cargado.")
+        return
+
+    try:
+        # Verificar si la hoja "Resistencias" existe
+        if "Resistencias" not in manager.workbook.sheetnames:
+            print("No se encontró la hoja 'Resistencias' en el archivo Excel.")
+            return
+
+        # Acceder a la hoja "Resistencias"
+        resistencias_sheet = manager.workbook["Resistencias"]
+
+        # Obtener los encabezados de la primera fila
+        encabezados = [cell.value for cell in resistencias_sheet[1] if cell.value]
+        encabezados_validos = [col for col in encabezados if "m" in str(col).lower()]
+        print("Encabezados válidos detectados:", encabezados_validos)
+
+        # Actualizar los valores de la lista desplegable
+        lista_resistividad["values"] = encabezados_validos
+        if encabezados_validos:
+            lista_resistividad.current(0)  # Seleccionar el primer elemento por defecto
+
+    except Exception as e:
+        print(f"Error al cargar encabezados válidos: {e}")
+
+# Llamar a la función para cargar encabezados válidos al inicializar la interfaz
+if manager.archivo_cargado():
+    cargar_encabezados_validos()
+else:
+    print("No se cargaron encabezados porque no hay ningún archivo abierto.")
+
+# Cargar los encabezados válidos al inicializar la interfaz
+cargar_encabezados_validos()
 
 # Función para abrir un archivo
 def abrir_archivo():
@@ -316,7 +425,6 @@ def actualizar_datos_principal():
 
 def abrir_nuevo():
     manager.crear_nuevo_archivo()
-
 
     # Habilitar las opciones del menú si el archivo es válido
     habilitar_menu_edit()
@@ -421,7 +529,7 @@ def abrir_ventana_spt():
         dimensiones = {
             "L": [150, 50],
             "Rectángulo": [100, 150],
-            "Triángulo": [100, 100,100],
+            "Triángulo": [100, 100, 100],
             "Línea": [150],
             "Circunferencia": [100],
         }
@@ -432,6 +540,7 @@ def abrir_ventana_spt():
             raise ValueError("Los puntos no tienen el formato esperado.")
 
     figura_desde_excel = False
+
     # Función para manejar el evento de cambio en el combobox
     def on_geometry_change(event):
         global figura_desde_excel
@@ -471,7 +580,7 @@ def abrir_ventana_spt():
                         dibujar_figura(canvas, tipo_geometria, dimensiones)
                         figura_desde_excel = True  # Marcar como dibujada desde datos del Excel
 
-                        print("puntos_str3",dimensiones)
+                        print("puntos_str3", dimensiones)
                         return
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudieron cargar los datos del área: {e}")
@@ -484,7 +593,6 @@ def abrir_ventana_spt():
 
         print("draw_geometry", dimensiones)
 
-
     def dibujar_figura(canvas, tipo, dimensiones):
         """
         Dibuja una figura en el canvas según el tipo y las dimensiones dadas.
@@ -496,8 +604,6 @@ def abrir_ventana_spt():
         global points_g  # Declarar points_g como variable global
         canvas.delete("all")  # Limpiar el canvas antes de dibujar
         print("Dibujar figura - dimensiones:", dimensiones)
-
-
 
         canvas_width, canvas_height = int(canvas["width"]), int(canvas["height"])
 
@@ -547,14 +653,14 @@ def abrir_ventana_spt():
         max_y = max(p[1] for p in points)
         scale_factor = min(canvas_width / max_x if max_x > canvas_width else 1,
                            canvas_height / max_y if max_y > canvas_height else 1)
-        print("Factor de escala: ",scale_factor)
-        scale_factor=scale_factor - 0.1
+        print("Factor de escala: ", scale_factor)
+        scale_factor = scale_factor - 0.1
         # Escalar los puntos para que se ajusten al canvas
         if scale_factor < 1:
             points_g = points
             print("sin escalar: ", points_g)
             points = [(x * scale_factor, y * scale_factor) for x, y in points]
-            print("escalado: ",points)
+            print("escalado: ", points)
 
         # Dibujar la figura ajustada
         if tipo == "L":
@@ -678,13 +784,12 @@ def abrir_ventana_spt():
             if not points_g or len(points_g) < 2:
                 messagebox.showerror("Error", "Debe haber al menos dos puntos para guardar la geometría.")
                 return
-            print("Points_g (guardar): ",points_g)
+            print("Points_g (guardar): ", points_g)
 
             # Calcular longitudes, perímetro y área
             longitudes, perimetro = calcular_longitudes_y_perimetro(points_g, geometry_type)
             area = calcular_area(geometry_type, longitudes)
             radio_equivalente = round(math.sqrt(area / math.pi), 4)
-
 
             # Guardar en la hoja Excel
             area_sheet.cell(row=fila_datos, column=1, value=geometry_type)
@@ -712,21 +817,21 @@ def abrir_ventana_spt():
         if tipo_geometria == "Rectángulo":
             # Área = Base × Altura
             base, altura = longitudes[:2]
-            return (base * altura)/10000
+            return (base * altura) / 10000
 
 
         elif tipo_geometria == "Línea":
             # El área de una línea es igual a su longitud total
-            return sum(longitudes)/100
+            return sum(longitudes) / 100
 
         elif tipo_geometria == "L":
             # Área = suma de los segmentos (vertical + horizontal)
-            return sum(longitudes[:2])/100
+            return sum(longitudes[:2]) / 100
 
         else:
             return 0
-    figura_desde_excel = False  # Indicar que ya no proviene de Excel
 
+    figura_desde_excel = False  # Indicar que ya no proviene de Excel
 
     # Vincular evento de cambio en combobox para dibujar automáticamente
     geometry_combo.bind("<<ComboboxSelected>>", lambda e: on_geometry_change)
@@ -772,6 +877,7 @@ def abrir_datos_proyecto():
 
             else:
                 ubicacion_mapa.config(text="No hay ningún archivo cargado.", fg="red")
+
     # Función para cargar imagen satelital
     def cargar_imagen():
         global file_path
@@ -791,7 +897,6 @@ def abrir_datos_proyecto():
     ventana_datos.title("Datos de proyecto")
     ventana_datos.geometry("570x395")
 
-
     # Función para guardar los datos
     def guardar_datos():
         global file_patch
@@ -805,7 +910,7 @@ def abrir_datos_proyecto():
                     "Nombre Dueño", "ID Dueño", "Nombre Profesional", "ID Profesional",
                     "Reg. SENESCYT", "Longitud", "Latitud", "Ruta Imagen Satelital"
                 ]
-                col=16
+                col = 16
                 for col, encabezado in enumerate(encabezados, start=1):
                     info_sheet.cell(row=1, column=col, value=encabezado)
             else:
@@ -838,7 +943,6 @@ def abrir_datos_proyecto():
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo guardar: {e}")
 
-
     # Función para limpiar los datos ingresados
     def limpiar_datos(estado_imagen=None, estado_circulo=None, indicador=None):
         for entry in entradas.values():
@@ -848,7 +952,6 @@ def abrir_datos_proyecto():
         fecha_final.set_date("")
         estado_imagen.config(text="No cargado", fg="red")
         estado_circulo.itemconfig(indicador, fill="red")
-
 
     # --- Entradas y Widgets ---
     entradas = {}
@@ -895,25 +998,25 @@ def abrir_datos_proyecto():
 
     # Frame - Coordenadas
     frame_utm = tk.LabelFrame(ventana_datos, text="Coordenadas UTM")
-    frame_utm.grid(column=0, row=3, columnspan=2, pady=5, padx=10,rowspan=2, sticky="ew")
+    frame_utm.grid(column=0, row=3, columnspan=2, pady=5, padx=10, rowspan=2, sticky="ew")
     entry_longitud = tk.Entry(frame_utm)
     entry_latitud = tk.Entry(frame_utm)
-    tk.Label(frame_utm, text="Longitud:").grid(row=0, column=0,pady=5, padx=5, sticky="w")
-    entry_longitud.grid(row=0, column=1,pady=5, padx=5, sticky="ew")
-    tk.Label(frame_utm, text="Latitud:").grid(row=1, column=0,pady=5, padx=5, sticky="w")
-    entry_latitud.grid(row=1, column=1,pady=5, padx=5, sticky="ew")
+    tk.Label(frame_utm, text="Longitud:").grid(row=0, column=0, pady=5, padx=5, sticky="w")
+    entry_longitud.grid(row=0, column=1, pady=5, padx=5, sticky="ew")
+    tk.Label(frame_utm, text="Latitud:").grid(row=1, column=0, pady=5, padx=5, sticky="w")
+    entry_latitud.grid(row=1, column=1, pady=5, padx=5, sticky="ew")
 
     # Frame - Dueño del Proyecto
     frame_dueno = tk.LabelFrame(ventana_datos, text="Dueño del Proyecto")
     frame_dueno.grid(column=2, row=0, columnspan=2, pady=5, padx=10)
 
     entry_nombre_dueno = tk.Entry(frame_dueno)
-    entry_nombre_dueno.grid(row=0, column=1,pady=5, padx=5)
-    tk.Label(frame_dueno, text="Nombre:").grid(row=0, column=0, sticky="e" ,pady=5, padx=5)
+    entry_nombre_dueno.grid(row=0, column=1, pady=5, padx=5)
+    tk.Label(frame_dueno, text="Nombre:").grid(row=0, column=0, sticky="e", pady=5, padx=5)
 
     entry_id_dueno = tk.Entry(frame_dueno)
-    entry_id_dueno.grid(row=1, column=1,pady=5, padx=5)
-    tk.Label(frame_dueno, text="Documento ID:").grid(row=1, column=0, sticky="e" ,pady=5, padx=5)
+    entry_id_dueno.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_dueno, text="Documento ID:").grid(row=1, column=0, sticky="e", pady=5, padx=5)
 
     # Frame - Profesional Responsable
     frame_profesional = tk.LabelFrame(ventana_datos, text="Profesional Responsable")
@@ -930,7 +1033,6 @@ def abrir_datos_proyecto():
     reg_senescyt = tk.Entry(frame_profesional)
     reg_senescyt.grid(row=2, column=1, pady=5, padx=5)
     tk.Label(frame_profesional, text="Reg. SENESCYT:").grid(row=2, column=0, sticky="e", pady=5, padx=5)
-
 
     # Frame - Imagen
     frame_imagen = tk.LabelFrame(ventana_datos, text="Cargar imagen satelital")
@@ -950,6 +1052,7 @@ def abrir_datos_proyecto():
     tk.Button(frame_botones, text="Guardar", command=guardar_datos, pady=5, padx=10).grid(row=0, column=0)
     tk.Button(frame_botones, text="Limpiar", command=limpiar_datos, pady=5, padx=10).grid(row=0, column=1)
     tk.Button(frame_botones, text="Cancelar", command=ventana_datos.destroy, pady=5, padx=10).grid(row=0, column=2)
+
 
 # Función para abrir la ventana "Datos de Resistencia"
 def abrir_datos_resistencia():
@@ -1344,7 +1447,6 @@ def abrir_datos_transformador():
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo cargar los datos: {e}")
 
-
     # Función para guardar los datos ingresados en el archivo Excel
     def guardar_datos_transformador():
         if not manager.archivo_cargado():
@@ -1420,7 +1522,6 @@ def abrir_datos_conductor():
     frame_varilla = tk.LabelFrame(ventana_conductor, text="Datos de Varilla", padx=10, pady=10)
     frame_varilla.pack(fill="x", padx=10, pady=10)
 
-
     # Datos ordenados descendentemente según el tamaño
     diametros = ["19mm", "18mm", "16mm", "14.7mm", "14mm", "12.5mm", "12mm", "3/4 in", "5/8 in"]
 
@@ -1430,17 +1531,15 @@ def abrir_datos_conductor():
     diametro_combo.set("5/8 in")
 
     tk.Label(frame_varilla, text="Longitud (cm)").grid(row=1, column=0, sticky="w", pady=5)
-    longitud_combo = ttk.Combobox(frame_varilla, values=["120", "150", "180","240"], state="readonly")
+    longitud_combo = ttk.Combobox(frame_varilla, values=["120", "150", "180", "240"], state="readonly")
     longitud_combo.set("240")  # Valor predeterminado
     longitud_combo.grid(row=1, column=1, pady=5)
-
-
 
     # Frame para Datos de Conductor
     frame_conductor = tk.LabelFrame(ventana_conductor, text="Datos de Conductor", padx=10, pady=10)
     frame_conductor.pack(fill="x", padx=10, pady=10)
 
-    Materiales_tipo= [
+    Materiales_tipo = [
         {
             "description": "Cobre, recocido, trefilado blando",
             "conductivity": 100,
@@ -1753,10 +1852,6 @@ def abrir_datos_conductor():
             diametro_label.config(text=f"{conductor['diameter_m']} m")
             seccion_label.config(text=f"{conductor['nominal_area_mm2']} m²")
 
-
-
-
-
     # Asociar la función al evento de cambio de selección en el combobox
     material_conductor_combo.bind("<<ComboboxSelected>>", actualizar_datos_conductor)
     calibre_combo.bind("<<ComboboxSelected>>", actualizar_datos_conductor)
@@ -1857,6 +1952,7 @@ def abrir_datos_conductor():
     # Cargar datos al abrir la ventana
     cargar_datos_conductor()
 
+
 puntos_rojos = []  # Lista para almacenar los puntos seleccionados como varillas
 
 
@@ -1869,7 +1965,7 @@ def abrir_diseno_malla_spt():
     ventana_diseno = tk.Toplevel(root)
     ventana_diseno.title("Diseño de Malla SPT")
     ventana_diseno.geometry("720x450")
-    ventana_diseno.resizable(True,True)
+    ventana_diseno.resizable(True, True)
 
     # Canvas en la parte izquierda
     canvas_frame = tk.Frame(ventana_diseno)
@@ -1884,7 +1980,7 @@ def abrir_diseno_malla_spt():
 
     # Sección de edición
     edicion_frame = tk.LabelFrame(control_frame, text="Edición", padx=5, pady=5)
-    edicion_frame.pack(fill="x",  padx=10, pady=10)
+    edicion_frame.pack(fill="x", padx=10, pady=10)
 
     tk.Label(edicion_frame, text="N° de Varillas").grid(row=0, column=0, padx=5, sticky="w")
     varillas_combo = ttk.Combobox(edicion_frame, values=["Option 1", "Option 2"], state="readonly")
@@ -1896,11 +1992,11 @@ def abrir_diseno_malla_spt():
     reticulas_combo.set("1")
 
     # Sección de variables
-    variables_frame = tk.LabelFrame(control_frame, text="Variables", pady=5,padx=5)
-    variables_frame.pack(fill="x", pady=10,padx=10)
+    variables_frame = tk.LabelFrame(control_frame, text="Variables", pady=5, padx=5)
+    variables_frame.pack(fill="x", pady=10, padx=10)
 
-    tk.Label(variables_frame, text="Longitud de conductor").grid(row=0, column=0, sticky="w",padx=2, pady=5)
-    tk.Label(variables_frame, text="Longitud de varilla").grid(row=1, column=0, sticky="w",padx=2, pady=5)
+    tk.Label(variables_frame, text="Longitud de conductor").grid(row=0, column=0, sticky="w", padx=2, pady=5)
+    tk.Label(variables_frame, text="Longitud de varilla").grid(row=1, column=0, sticky="w", padx=2, pady=5)
 
     # Botones
     boton_frame = tk.Frame(control_frame)
@@ -1908,7 +2004,7 @@ def abrir_diseno_malla_spt():
 
     global_scale_factor = 1  # Por defecto 1, cambiará en la función ajustar_y_dibujar_figura
 
-    def ajustar_y_dibujar_figura(canvas, puntos, canvas_width, canvas_height,tipo_geometria):
+    def ajustar_y_dibujar_figura(canvas, puntos, canvas_width, canvas_height, tipo_geometria):
         """
         Ajusta los puntos para que se adapten al tamaño del canvas y los dibuja,
         además calcula y muestra las distancias entre puntos originales.
@@ -2004,7 +2100,7 @@ def abrir_diseno_malla_spt():
             # Leer el tipo de geometría y los puntos desde la hoja "Área"
             area_sheet = manager.workbook["Área"]
             tipo_geometria = area_sheet.cell(row=2, column=1).value  # Supone que el tipo está en la columna 1
-            puntos_str = area_sheet.cell(row=2, column=2).value      # Supone que los puntos están en la columna 2
+            puntos_str = area_sheet.cell(row=2, column=2).value  # Supone que los puntos están en la columna 2
 
             if not puntos_str:
                 messagebox.showerror("Error", "No hay puntos definidos en la hoja 'Área'.")
@@ -2103,7 +2199,6 @@ def abrir_diseno_malla_spt():
         # Mostrar la longitud total en el label
         V_longitud_varilla.config(text=f"{longitud_total} cm")
 
-
         # Deshabilitar los widgets
         varillas_combo.config(state="disabled")
         reticulas_combo.config(state="disabled")
@@ -2152,10 +2247,10 @@ def abrir_diseno_malla_spt():
 
                 # Agregar a la lista de seleccionados
                 puntos_seleccionados.append(punto_cercano)
-                print("Puntos seleccionados",puntos_seleccionados)
+                print("Puntos seleccionados", puntos_seleccionados)
                 puntos_rojos.append(
                     (x / global_scale_factor, y / global_scale_factor))  # Ajustar según el factor de escala
-                print("Puntos Rojos",puntos_rojos)
+                print("Puntos Rojos", puntos_rojos)
 
                 # Verificar si ya se seleccionaron suficientes puntos
                 if len(puntos_seleccionados) == num_varillas:
@@ -2351,7 +2446,6 @@ def abrir_diseno_malla_spt():
         global distancia_total  # Nueva variable para almacenar la distancia total
         global lineas_creadas  # Declarar como global para ser accesible
 
-
         distancia_total = 0  # Inicializar la distancia total
 
         messagebox.showinfo(
@@ -2486,8 +2580,6 @@ def abrir_diseno_malla_spt():
                 global puntos_conectados
                 puntos_conectados = len(lineas_creadas) > 0
 
-
-
         def finalizar_conexion():
             """
             Finaliza la conexión de puntos, elimina el botón "Ok", y habilita los widgets.
@@ -2512,7 +2604,6 @@ def abrir_diseno_malla_spt():
             boton_conectar_p.config(state="disabled")
             reticulas_combo.config(state="disabled")
             V_longitud_conductor.config(text=f"{distancia_total} cm")
-
 
         boton_ok.config(command=finalizar_conexion)
         boton_deshacer.config(command=deshacer_ultima_linea)
@@ -2578,15 +2669,16 @@ def abrir_diseno_malla_spt():
 
     #Declaración de labels para mostrar datos
     V_longitud_conductor = tk.Label(variables_frame, text="Valor")
-    V_longitud_conductor.grid(row=0, column=1, sticky="e",padx=5, pady=5)
+    V_longitud_conductor.grid(row=0, column=1, sticky="e", padx=5, pady=5)
     V_longitud_varilla = tk.Label(variables_frame, text="Valor")
-    V_longitud_varilla.grid(row=1, column=1, sticky="e",padx=5, pady=5)
+    V_longitud_varilla.grid(row=1, column=1, sticky="e", padx=5, pady=5)
 
     # Llamar a la función para cargar y dibujar al abrir la ventana
     cargar_datos_y_dibujar()
     boton_conectar_p = tk.Button(boton_frame, text="Conectar Puntos", width=25, command=conectar_puntos)
     boton_conectar_p.pack(pady=5)
-    boton_seleccionar_varillas = tk.Button(boton_frame, text="Seleccionar Varillas", width=25, command=seleccionar_puntos_de_varillas, state="disabled")
+    boton_seleccionar_varillas = tk.Button(boton_frame, text="Seleccionar Varillas", width=25,
+                                           command=seleccionar_puntos_de_varillas, state="disabled")
     boton_seleccionar_varillas.pack(pady=5)
     tk.Button(boton_frame, text="Guardar", width=25, command=guardar_datos).pack(pady=5)
     tk.Button(boton_frame, text="Cancelar", width=25, command=ventana_diseno.destroy).pack(pady=5)
@@ -2675,7 +2767,7 @@ def abrir_analisis_cortocircuito():
                 EMt = float(trafos_sheet.cell(row=ultima_fila, column=1).value or 0)  # Tensión del primario (V)
                 EBt = float(trafos_sheet.cell(row=ultima_fila, column=2).value or 0)  # Tensión del secundario (V)
                 Z = float(trafos_sheet.cell(row=ultima_fila, column=6).value.split()[0])  # Impedancia (%)
-                Sf=0.20;
+                Sf = 0.20;
             except ValueError as e:
                 tk.messagebox.showerror("Error", f"No se pudo obtener datos válidos del Excel: {e}")
                 return
@@ -2687,11 +2779,10 @@ def abrir_analisis_cortocircuito():
             # Validar que los valores tf y xr existen en el diccionario
             if tf in data and xr in data[tf]:
                 Df = data[tf][xr]
-                Icc_asimBT = ICCmaxBT* Df
+                Icc_asimBT = ICCmaxBT * Df
                 Icc_asimMT = ICCmaxMT * Df
-                Ig= Sf * Icc_asimBT #Corriente simétrica de falla
-                IG= Df * Ig         #Corriente máxima de falla
-
+                Ig = Sf * Icc_asimBT  #Corriente simétrica de falla
+                IG = Df * Ig  #Corriente máxima de falla
 
                 # Mostrar los resultados en los campos
                 corriente_sim_falla.delete(0, tk.END)  # Limpiar campo
@@ -2707,12 +2798,10 @@ def abrir_analisis_cortocircuito():
         except Exception as e:
             tk.messagebox.showerror("Error", f"Ha ocurrido un error: {e}")
 
-
-
-
-    tk.Button(frame_principal, text="Guardar", command=guardar_datos_cortocircuito).grid(row=4, column=1, columnspan=2, pady=20)
-    tk.Button(frame_principal, text="Calcular", command=Calcular_cortocircuito).grid(row=4, column=0, columnspan=2, pady=20)
-
+    tk.Button(frame_principal, text="Guardar", command=guardar_datos_cortocircuito).grid(row=4, column=1, columnspan=2,
+                                                                                         pady=20)
+    tk.Button(frame_principal, text="Calcular", command=Calcular_cortocircuito).grid(row=4, column=0, columnspan=2,
+                                                                                     pady=20)
 
 
 def abrir_analisis_resistividad():
@@ -2751,7 +2840,6 @@ def abrir_analisis_resistividad():
             float(etiq.replace('m', ''))  # Extraer la distancia numérica de etiquetas como "2m"
             for etiq in encabezados[1:] if etiq and etiq.endswith("m")
         ]
-
 
         # Leer los datos de resistencias desde la hoja
         resistencias = []
@@ -2817,16 +2905,20 @@ def abrir_analisis_resistividad():
         messagebox.showerror("Error", f"No se pudo realizar el análisis de resistividad: {e}")
 
 
-def calcular_resistividad_con_profundidad():
+def calcular_resistividad_con_profundidad(encabezado_seleccionado=None):
     """
     Calcula resistividades, promedios por distancia y solicita profundidad.
     Luego obtiene Lc, dc, A y r desde hojas específicas, realizando conversiones.
+    Si se proporciona un encabezado seleccionado, usa ese encabezado en lugar de solicitarlo.
     """
     if not manager.archivo_cargado():
         print("No hay ningún archivo abierto para calcular resistividades.")
         return
 
     try:
+        # Definir el diccionario 'promedios' como vacío (si no se tiene información previa)
+        promedios = {}
+
         # Verificar si la hoja "Resistencias" existe
         if "Resistencias" not in manager.workbook.sheetnames:
             print("No se encontró la hoja 'Resistencias' en el archivo Excel.")
@@ -2843,51 +2935,57 @@ def calcular_resistividad_con_profundidad():
         columnas_validas = [col for col in encabezados if "m" in str(col).lower()]
         print("Columnas válidas detectadas:", columnas_validas)
 
-        # Crear un diccionario para almacenar las resistividades de cada columna
-        resistividades = {col: [] for col in columnas_validas}
+        # Si no se proporciona un encabezado seleccionado, solicitarlo
+        if encabezado_seleccionado is None:
+            print("\nPor favor, elija una distancia de las disponibles:", ", ".join(columnas_validas))
+            encabezado_seleccionado = input("Distancia seleccionada: ").strip()
+
+        # Validar encabezado seleccionado
+        if encabezado_seleccionado not in columnas_validas:
+            print("El encabezado seleccionado no es válido o no contiene datos.")
+            return
+
+        # Crear una lista para almacenar las resistividades de la columna seleccionada
+        resistividades = []
 
         # Recorrer las filas desde la segunda fila
         for row in resistencias_sheet.iter_rows(min_row=2, max_row=resistencias_sheet.max_row, values_only=True):
             fila_dict = dict(zip(encabezados, row))  # Convertir la fila en un diccionario clave:valor
-            for col in columnas_validas:
-                valor = fila_dict.get(col)  # Acceder al valor por nombre de columna
-                try:
-                    # Extraer la distancia (por ejemplo, "2m" → 2)
-                    distancia = float(col.lower().replace('m', '').strip())
+            valor = fila_dict.get(encabezado_seleccionado)  # Acceder al valor por nombre de columna
+            try:
+                # Extraer la distancia (por ejemplo, "2m" → 2)
+                distancia = float(encabezado_seleccionado.lower().replace('m', '').strip())
 
-                    # Convertir el valor a número si es una cadena
-                    if isinstance(valor, str):
-                        valor = float(valor.replace(',', '.'))
+                # Convertir el valor a número si es una cadena
+                if isinstance(valor, str):
+                    valor = float(valor.replace(',', '.'))
 
-                    if isinstance(valor, (int, float)) and valor > 0:  # Verificar que sea numérico y positivo
-                        # Calcular resistividad usando la fórmula
-                        resistividad = 2 * math.pi * distancia * valor
-                        resistividades[col].append(resistividad)
-                except (ValueError, TypeError):
-                    continue
+                if isinstance(valor, (int, float)) and valor > 0:  # Verificar que sea numérico y positivo
+                    # Calcular resistividad usando la fórmula
+                    resistividad = 2 * math.pi * distancia * valor
+                    resistividades.append(resistividad)
+            except (ValueError, TypeError):
+                continue
 
-        # Calcular los promedios de resistividades
-        promedios = {}
-        for col, valores in resistividades.items():
-            promedios[col] = sum(valores) / len(valores) if valores else None
+        # Calcular el promedio de resistividades
+        promedio_resistividad = sum(resistividades) / len(resistividades) if resistividades else None
 
-        # Mostrar promedios
-        print("\n--- Promedio de Resistividad por Distancia ---")
-        for col, promedio in promedios.items():
-            if promedio is not None:
-                print(f"{col}: {promedio:.2f} Ω·m")
-            else:
-                print(f"{col}: No hay datos disponibles")
+        # Mostrar el promedio calculado
+        print("\n--- Promedio de Resistividad ---")
+        if promedio_resistividad is not None:
+            print(f"{encabezado_seleccionado}: {promedio_resistividad:.2f} Ω·m")
+        else:
+            print(f"{encabezado_seleccionado}: No hay datos disponibles")
+
+        # Definir medida_elegida (se puede usar encabezado_seleccionado si es necesario)
+        medida_elegida = encabezado_seleccionado
 
         # Solicitar distancia seleccionada
-        print("\nPor favor, elija una distancia de las disponibles:", ", ".join(columnas_validas))
-        medida_elegida = input("Distancia seleccionada: ").strip()
-
-        if medida_elegida not in promedios or promedios[medida_elegida] is None:
+        if medida_elegida not in promedios or promedios.get(medida_elegida) is None:
             print("La distancia seleccionada no es válida o no tiene datos.")
             return
-        p=promedios[medida_elegida]
-        print(f"Usted seleccionó '{medida_elegida}' con promedio: {promedios[medida_elegida]:.2f} Ω·m")
+        p = promedios.get(medida_elegida)
+        print(f"Usted seleccionó '{medida_elegida}' con promedio: {promedios.get(medida_elegida):.2f} Ω·m")
 
         # Solicitar valor de profundidad h
         h = float(input("Ingrese el valor de profundidad de los conductores (h) en metros: ").strip())
@@ -2916,7 +3014,7 @@ def calcular_resistividad_con_profundidad():
         if Nv is None:
             print("No se encontró un valor para la Longitud total de varillas (Lv).")
             return
-        Nv=float(Nv)
+        Nv = float(Nv)
         print(f"Número de varillas: {Nv}")
 
         # Obtener "Diámetro del conductor" (dc) desde la hoja 'Conductor'
@@ -2940,14 +3038,14 @@ def calcular_resistividad_con_profundidad():
         area_sheet = manager.workbook["Área"]
         a = area_sheet.cell(row=2, column=5).value  # Columna 5: Área
         a = float(a)
-        print("a=",a)
+        print("a=", a)
         r = area_sheet.cell(row=2, column=6).value  # Columna 6: Radio equivalente
         r = float(r)  # Convertir a flotante
         print("r=", r)
 
-        lt=float(Lc_metros+(Nv*Lv_metros))
-        print("Lt=",lt)
-        rg=float(p*((1/lt)+(1/math.sqrt(20*a))*(1+(1/1+h*(math.sqrt(20/a))))))
+        lt = float(Lc_metros + (Nv * Lv_metros))
+        print("Lt=", lt)
+        rg = float(p * ((1 / lt) + (1 / math.sqrt(20 * a)) * (1 + (1 / 1 + h * (math.sqrt(20 / a))))))
         print("Rg=", rg)
 
         if a is None or r is None:
@@ -2957,27 +3055,30 @@ def calcular_resistividad_con_profundidad():
         print(f"Área (A): {a:.4f} m²")
         print(f"Radio equivalente (r): {r:.4f} m")
 
+        # Frame Botón Calcular
+        boton_Calcular_frame = tk.Frame(Columna_3, pady=5, padx=5)
+        boton_Calcular_frame.grid(row=6, column=0, padx=5, pady=5, sticky="w")
+
+        # Botón Calcular dentro del Frame (Asegurándonos de que no esté duplicado)
+        boton_calcular = tk.Button(boton_Calcular_frame, text="Calcular")
+        boton_calcular.grid(row=0, column=0)  # Asegurándonos de que solo esté una vez
+        tk.Button(boton_Calcular_frame, text="Cálculo", command=calcular_resistividad_con_profundidad).grid(row=0,
+                                                                                                            column=0)
+
         # Mostrar todos los valores obtenidos
         print("\n--- Valores Obtenidos ---")
         print(f"Distancia seleccionada: {medida_elegida}")
-        print(f"Promedio de Resistividad: {promedios[medida_elegida]:.2f} Ω·m")
+        print(f"Promedio de Resistividad: {promedios.get(medida_elegida):.2f} Ω·m")
         print(f"Profundidad (h): {h:.2f} m")
         print(f"Longitud total del conductor (Lc): {Lc_metros:.2f} m")
         print(f"Diámetro del conductor (dc): {dc:.4f} m")
         print(f"Área (A): {a:.2f} m²")
         print(f"Radio equivalente (r): {r:.4f} m")
         print(f"Resistencia total de la malla (Rg): {rg:.4f} Ω")
+
     except Exception as e:
-        print(f"Error al calcular resistividades y obtener valores adicionales: {e}")
+        print(f"Error al calcular resistividades: {e}")
 
-
-
-
-
-
-
-
-tk.Button(boton_Calcular_frame, text="Cálculo", command=calcular_resistividad_con_profundidad).grid(row=0, column=0)
 
 def deshabilitar_menu_edit():
     edit_menu.entryconfig("Datos de proyecto", state="disabled")
@@ -3016,7 +3117,7 @@ menu_bar.add_cascade(label="Edición", menu=edit_menu)
 
 # Crear el menú "Análisis"
 analisis_spt = Menu(menu_bar, tearoff=0)
-analisis_spt.add_command(label="Diseño de malla SPT",command=abrir_diseno_malla_spt)
+analisis_spt.add_command(label="Diseño de malla SPT", command=abrir_diseno_malla_spt)
 analisis_spt.add_command(label="Análisis de cortocircuito", command=abrir_analisis_cortocircuito)
 analisis_spt.add_command(label="Análisis de Resistividad", command=abrir_analisis_resistividad)
 menu_bar.add_cascade(label="Análisis", menu=analisis_spt)
@@ -3029,7 +3130,6 @@ reports_menu.add_command(label="Exportar CSV")
 reports_menu.add_command(label="Exportar Excel")
 reports_menu.add_command(label="Exportar Gráfico de malla")
 menu_bar.add_cascade(label="Reportes", menu=reports_menu)
-
 
 # Crear el menú "Ayuda"
 help_menu = Menu(menu_bar, tearoff=0)

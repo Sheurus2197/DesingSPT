@@ -1,0 +1,55 @@
+Index: Principal.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Principal.py b/Principal.py
+--- a/Principal.py	
++++ b/Principal.py	(date 1731593919405)
+@@ -7,6 +7,9 @@
+ from datetime import datetime
+ import math
+ 
++#from io import BytesIO
++#from PIL import Image, ImageTk
++
+ archivo_actual = None  # Inicializar como None
+ 
+ # Crear la ventana principal
+@@ -58,6 +61,36 @@
+ spt_canvas = tk.Canvas(left_frame, width=300, height=300, bg="white")
+ spt_canvas.pack(pady=20)
+ 
++# Función para calcular resistividades y almacenarlas en una lista
++def Calcular_resistividades():
++    if not archivo_actual:
++        messagebox.showwarning("Advertencia", "No hay ningún archivo abierto.")
++        return None
++
++    try:
++        wb = load_workbook(archivo_actual)
++        ws = wb.active
++
++        resistividades = {}
++        distancias = [1, 2, 3, 4]  # Distancias en metros
++        for i, d in enumerate(distancias, start=2):  # Comienza en la columna B (índice 2)
++            resistividades[f"d={d}m"] = []
++            for row in range(21, 25):  # Filas A21 a E24
++                R = ws.cell(row=row, column=i).value  # Obteniendo el valor de resistencia
++                if R is not None:
++                    ro = 2 * math.pi * d * R
++                    resistividades[f"d={d}m"].append(ro)
++                else:
++                    resistividades[f"d={d}m"].append(None)  # Si no hay dato, coloca None
++
++        return resistividades
++
++    except Exception as e:
++        messagebox.showerror("Error", f"No se pudo calcular resistividades: {e}")
++        return None
++
++# Función para mostrar el gráfico de resistividades en un nuevo Canvas
++
+ 
+ # Función para dibujar los perfiles en el Canvas de resistencia
+ def dibujar_perfiles(ws):

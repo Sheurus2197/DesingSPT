@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import Menu, filedialog, messagebox, ttk
-from numpy.f2py.crackfortran import endifs
 from tkcalendar import DateEntry
 import os
 from openpyxl import load_workbook, Workbook
@@ -47,31 +46,107 @@ Columna_3 = tk.Frame(main_frame)
 Columna_3.grid(row=0, column=2, padx=5, pady=5)
 
 #Frame de proyecto
-Infor_proyecto_frame = tk.LabelFrame(Columna_1, text="Información del Proyecto",pady=5,padx=5)
-Infor_proyecto_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2)
+Infor_proyecto_frame = tk.LabelFrame(Columna_1, text="Información del Proyecto",pady=5,padx=5, font=("Arial", 14))
+Infor_proyecto_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2, sticky="w")
 tk.Label(Infor_proyecto_frame, text="Título del proyecto: ").grid(row=0, column=0, sticky="e")
 tk.Label(Infor_proyecto_frame, text="Tensión Primario: ").grid(row=1, column=0, sticky="e")
 tk.Label(Infor_proyecto_frame, text="Tensión Secundario: ").grid(row=2, column=0, sticky="e")
 tk.Label(Infor_proyecto_frame, text="Potencia Nominal:").grid(row=3, column=0, sticky="e")
 
 titulo_proyecto_val = tk.Label(Infor_proyecto_frame, text="Proyecto 1")
-tension_primario_val = tk.Label(Infor_proyecto_frame, text="")
-tension_secundario_val = tk.Label(Infor_proyecto_frame, text="")
-potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="")
-
 titulo_proyecto_val.grid(row=0, column=1, sticky="w")
+
+tension_primario_val = tk.Label(Infor_proyecto_frame, text="")
 tension_primario_val.grid(row=1, column=1, sticky="w")
+
+tension_secundario_val = tk.Label(Infor_proyecto_frame, text="")
 tension_secundario_val.grid(row=2, column=1, sticky="w")
+
+potencia_nominal_val = tk.Label(Infor_proyecto_frame, text="")
 potencia_nominal_val.grid(row=3, column=1, sticky="w")
 
-Objetivo_frame = tk.LabelFrame(Columna_1, text="Objetivos",pady=5,padx=5)
-Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, rowspan=13)
-tk.Label(Objetivo_frame, text="Objetivo 1: ").grid(row=0, column=0, sticky="e")
-tk.Label(Objetivo_frame, text="Objetivo 2: ").grid(row=1, column=0, sticky="e")
-tk.Label(Objetivo_frame, text="Objetivo 3: ").grid(row=2, column=0, sticky="e")
+# Frame de objetivos
+Objetivo_frame = tk.LabelFrame(Columna_1, text="Objetivos", pady=5, padx=5, font=("Arial", 14))
+Objetivo_frame.grid(row=2, column=0, padx=5, pady=5, sticky="w")  # Alineado a la izquierda
 
+# Objetivo 1
+tk.Label(Objetivo_frame, text="Objetivo 1:", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
+objetivo1_var = tk.BooleanVar(value=False)
+objetivo1_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo1_var, state="disabled")
+objetivo1_checkbox.grid(row=0, column=1, sticky="w")
 
-titulo_proyecto_val.grid(row=0, column=1, sticky="w")
+# Objetivo 2
+tk.Label(Objetivo_frame, text="Objetivo 2:", font=("Arial", 12)).grid(row=1, column=0, sticky="e")
+objetivo2_var = tk.BooleanVar(value=False)
+objetivo2_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo2_var, state="disabled")
+objetivo2_checkbox.grid(row=1, column=1, sticky="w")
+
+# Objetivo 3
+tk.Label(Objetivo_frame, text="Objetivo 3:", font=("Arial", 12)).grid(row=2, column=0, sticky="e")
+objetivo3_var = tk.BooleanVar(value=False)
+objetivo3_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo3_var, state="disabled")
+objetivo3_checkbox.grid(row=2, column=1, sticky="w")
+
+# Objetivo 4
+tk.Label(Objetivo_frame, text="Objetivo 4:", font=("Arial", 12)).grid(row=3, column=0, sticky="e")
+objetivo4_var = tk.BooleanVar(value=False)
+objetivo4_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo4_var, state="disabled")
+objetivo4_checkbox.grid(row=3, column=1, sticky="w")
+
+# Objetivo 5
+tk.Label(Objetivo_frame, text="Objetivo 5:", font=("Arial", 12)).grid(row=4, column=0, sticky="e")
+objetivo5_var = tk.BooleanVar(value=False)
+objetivo5_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo5_var, state="disabled")
+objetivo5_checkbox.grid(row=4, column=1, sticky="w")
+
+# Objetivo 6
+tk.Label(Objetivo_frame, text="Objetivo 6:", font=("Arial", 12)).grid(row=5, column=0, sticky="e")
+objetivo6_var = tk.BooleanVar(value=False)
+objetivo6_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo6_var, state="disabled")
+objetivo6_checkbox.grid(row=5, column=1, sticky="w")
+
+# Objetivo 7
+tk.Label(Objetivo_frame, text="Objetivo 7:", font=("Arial", 12)).grid(row=6, column=0, sticky="e")
+objetivo7_var = tk.BooleanVar(value=False)
+objetivo7_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo7_var, state="disabled")
+objetivo7_checkbox.grid(row=6, column=1, sticky="w")
+
+# Objetivo 8
+tk.Label(Objetivo_frame, text="Objetivo 8:", font=("Arial", 12)).grid(row=7, column=0, sticky="e")
+objetivo8_var = tk.BooleanVar(value=False)
+objetivo8_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo8_var, state="disabled")
+objetivo8_checkbox.grid(row=7, column=1, sticky="w")
+
+# Objetivo 9
+tk.Label(Objetivo_frame, text="Objetivo 9:", font=("Arial", 12)).grid(row=8, column=0, sticky="e")
+objetivo9_var = tk.BooleanVar(value=False)
+objetivo9_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo9_var, state="disabled")
+objetivo9_checkbox.grid(row=8, column=1, sticky="w")
+
+# Objetivo 10
+tk.Label(Objetivo_frame, text="Objetivo 10:", font=("Arial", 12)).grid(row=9, column=0, sticky="e")
+objetivo10_var = tk.BooleanVar(value=False)
+objetivo10_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo10_var, state="disabled")
+objetivo10_checkbox.grid(row=9, column=1, sticky="w")
+
+# Objetivo 11
+tk.Label(Objetivo_frame, text="Objetivo 11:", font=("Arial", 12)).grid(row=10, column=0, sticky="e")
+objetivo11_var = tk.BooleanVar(value=False)
+objetivo11_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo11_var, state="disabled")
+objetivo11_checkbox.grid(row=10, column=1, sticky="w")
+
+# Objetivo 12
+tk.Label(Objetivo_frame, text="Objetivo 12:", font=("Arial", 12)).grid(row=11, column=0, sticky="e")
+objetivo12_var = tk.BooleanVar(value=False)
+objetivo12_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo12_var, state="disabled")
+objetivo12_checkbox.grid(row=11, column=1, sticky="w")
+
+# Objetivo 13
+tk.Label(Objetivo_frame, text="Objetivo 13:", font=("Arial", 12)).grid(row=12, column=0, sticky="e")
+objetivo13_var = tk.BooleanVar(value=False)
+objetivo13_checkbox = tk.Checkbutton(Objetivo_frame, variable=objetivo13_var, state="disabled")
+objetivo13_checkbox.grid(row=12, column=1, sticky="w")
+
 
 
 canvas_2d_3d = tk.Frame(Columna_2,pady=5,padx=5)

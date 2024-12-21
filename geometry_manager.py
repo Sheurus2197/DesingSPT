@@ -2,7 +2,7 @@
 
 import math
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 
 class GeometryManager:
@@ -23,7 +23,8 @@ class GeometryManager:
 
     def abrir_ventana_spt(self):
         """
-        Abre la ventana para gestionar geometrías.
+        Abre la ventana de "Geometría Definida" para seleccionar y dibujar geometrías.
+        Si existen datos en la hoja "Área" del archivo Excel, los muestra en el canvas.
         """
         ventana_geometria = tk.Toplevel()
         ventana_geometria.title("Geometría Definida")
@@ -40,22 +41,32 @@ class GeometryManager:
         # Listbox para seleccionar geometría
         tk.Label(control_frame, text="Geometría").grid(row=0, column=0, padx=5)
         geometry_var = tk.StringVar(value="L")
-        geometry_combo = tk.ttk.Combobox(
+        geometry_combo = ttk.Combobox(
             control_frame, textvariable=geometry_var,
             values=["L", "Rectángulo", "Línea", "Triángulo", "Circunferencia"]
         )
         geometry_combo.grid(row=0, column=1, padx=5)
 
         # Botones
-        tk.Button(control_frame, text="Editar", command=lambda: self.editar_geometria()).grid(row=0, column=2, padx=5)
-        tk.Button(control_frame, text="Guardar", command=lambda: self.guardar_geometria()).grid(row=0, column=3, padx=5)
+        tk.Button(control_frame, text="Editar", command=self.editar_geometria).grid(row=0, column=2, padx=5)
+        tk.Button(control_frame, text="Guardar", command=self.guardar_geometria).grid(row=0, column=3, padx=5)
 
-        # Dibujar figura inicial
-        self.geometry_type = "L"
-        self.points = self.obtener_dimensiones_predeterminadas(self.geometry_type)
-        self.dibujar_figura(self.geometry_type, self.points)
+        # Dibujar figura inicial (desde Excel o predeterminada)
+        self.cargar_figura_desde_excel()
+        if not self.figura_desde_excel:
+            self.geometry_type = "L"
+            self.points = self.obtener_dimensiones_predeterminadas(self.geometry_type)
+            self.dibujar_figura(self.geometry_type, self.points)
 
         # Vincular evento al combobox
+        geometry_combo.bind("<<ComboboxSelected>>", lambda e: self.cambiar_geometria(geometry_var.get()))
+
+        # Mostrar longitudes y perímetro
+        dimensiones_frame = tk.Frame(ventana_geometria)
+        dimensiones_frame.pack(pady=5)
+        self.mostrar_dimensiones_y_perimetro(dimensiones_frame)
+
+        # Dibujar automáticamente si se cambia la geometría
         geometry_combo.bind("<<ComboboxSelected>>", lambda e: self.cambiar_geometria(geometry_var.get()))
 
     def cambiar_geometria(self, nueva_geometria):
@@ -89,6 +100,7 @@ class GeometryManager:
         :param tipo: Tipo de figura.
         :param dimensiones: Dimensiones necesarias para la figura.
         """
+        global points
         self.canvas.delete("all")  # Limpiar canvas
 
         if tipo == "L":
@@ -134,29 +146,63 @@ class GeometryManager:
 
     def guardar_geometria(self):
         """
-        Guarda los datos de la geometría actual en el archivo Excel.
+        Guarda los datos de la geometría actual en la hoja "Área" del archivo Excel.
         """
         if not self.excel_manager.archivo_cargado():
-            messagebox.showwarning("Advertencia", "No hay ningún archivo abierto para guardar.")
+            messagebox.showwarning("Advertencia", "No hay un archivo abierto para guardar los datos.")
             return
 
         try:
+            # Acceder o crear la hoja "Área"
             if "Área" not in self.excel_manager.workbook.sheetnames:
                 area_sheet = self.excel_manager.workbook.create_sheet("Área")
-                encabezados = ["Tipo de Geometría", "Dimensiones"]
+                # Crear encabezados
+                encabezados = ["Tipo de Geometría", "Puntos", "Longitudes de Segmentos", "Perímetro", "Área",
+                               "Radio Equivalente"]
                 for col, encabezado in enumerate(encabezados, start=1):
                     area_sheet.cell(row=1, column=col, value=encabezado)
             else:
                 area_sheet = self.excel_manager.workbook["Área"]
 
-            fila = 2
-            area_sheet.cell(row=fila, column=1, value=self.geometry_type)
-            area_sheet.cell(row=fila, column=2, value=str(self.points))
+            # Calcular las longitudes, perímetro y área
+            longitudes, perimetro = self.calcular_longitudes_y_perimetro(self.points, self.geometry_type)
+            area = self.calcular_area(self.geometry_type, longitudes)
+            radio_equivalente = round(math.sqrt(area / math.pi), 4)
 
+            # Escribir datos en la segunda fila de la hoja
+            area_sheet.cell(row=2, column=1, value=self.geometry_type)  # Tipo de geometría
+            area_sheet.cell(row=2, column=2, value=str(self.points))  # Puntos
+            area_sheet.cell(row=2, column=3, value=str(longitudes))  # Longitudes de segmentos
+            area_sheet.cell(row=2, column=4, value=round(perimetro, 2))  # Perímetro
+            area_sheet.cell(row=2, column=5, value=round(area, 4))  # Área
+            area_sheet.cell(row=2, column=6, value=radio_equivalente)  # Radio equivalente
+
+            # Guardar el archivo
             self.excel_manager.guardar_archivo()
-            messagebox.showinfo("Éxito", "Geometría guardada correctamente.")
+            messagebox.showinfo("Éxito", "Los datos de la geometría han sido guardados correctamente.")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo guardar la geometría: {e}")
+
+    def calcular_area(self, tipo_geometria, longitudes):
+        """
+        Calcula el área de la figura según su tipo.
+
+        :param tipo_geometria: Tipo de geometría ('Rectángulo', 'L', etc.).
+        :param longitudes: Lista de longitudes de los segmentos.
+        :return: Área calculada.
+        """
+        if tipo_geometria == "Rectángulo":
+            # Área = Base × Altura
+            base, altura = longitudes[:2]
+            return base * altura / 10000
+        elif tipo_geometria == "Línea":
+            # El área de una línea es igual a 0
+            return 0
+        elif tipo_geometria == "L":
+            # Área aproximada = suma de los segmentos
+            return sum(longitudes[:2]) / 100
+        else:
+            return 0
 
     def editar_geometria(self):
         """
@@ -185,3 +231,91 @@ class GeometryManager:
                 messagebox.showerror("Error", "Ingrese valores numéricos válidos.")
 
         tk.Button(ventana_editar, text="Guardar", command=guardar_cambios).grid(row=len(entries), column=0, columnspan=2)
+
+    def mostrar_dimensiones_y_perimetro(self, parent_frame):
+        """
+        Muestra las dimensiones de los segmentos y el perímetro de la figura actual.
+        """
+        tk.Label(parent_frame, text="Longitudes de segmentos:", font=("Arial", 10)).grid(row=0, column=0, sticky="w",
+                                                                                         padx=5)
+        self.longitudes_label = tk.Label(parent_frame, text="-", font=("Arial", 10))
+        self.longitudes_label.grid(row=0, column=1, sticky="w", padx=5)
+
+        tk.Label(parent_frame, text="Perímetro:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=5)
+        self.perimetro_label = tk.Label(parent_frame, text="-", font=("Arial", 10))
+        self.perimetro_label.grid(row=1, column=1, sticky="w", padx=5)
+
+        # Actualizar las longitudes y el perímetro con los datos actuales
+        self.actualizar_dimensiones_y_perimetro()
+
+    def actualizar_dimensiones_y_perimetro(self):
+        """
+        Calcula y actualiza las longitudes de los segmentos y el perímetro.
+        """
+        if not self.points:
+            self.longitudes_label.config(text="-")
+            self.perimetro_label.config(text="-")
+            return
+
+        longitudes, perimetro = self.calcular_longitudes_y_perimetro(self.points, self.geometry_type)
+        self.longitudes_label.config(text=", ".join(map(str, longitudes)))
+        self.perimetro_label.config(text=f"{perimetro:.2f}")
+
+    def calcular_longitudes_y_perimetro(self, puntos, tipo_geometria):
+        """
+        Calcula las longitudes de los segmentos y el perímetro de la figura según su tipo.
+
+        :param puntos: Lista de puntos [(x1, y1), (x2, y2), ...] que definen la figura.
+        :param tipo_geometria: Tipo de geometría ('L', 'Rectángulo', 'Triángulo', etc.).
+        :return: Una lista de longitudes y el perímetro total.
+        """
+        longitudes = []
+        perimetro = 0
+
+        for i in range(len(puntos) - (1 if tipo_geometria in ["L", "Línea"] else 0)):
+            x1, y1 = puntos[i]
+            x2, y2 = puntos[(i + 1) % len(puntos)]  # Conexión cíclica para figuras cerradas
+            distancia = round(math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2), 2)
+            longitudes.append(distancia)
+            perimetro += distancia
+
+        return longitudes, perimetro
+
+    def cargar_figura_desde_excel(self):
+        """
+        Carga datos de geometría desde la hoja "Área" del archivo Excel si está disponible.
+        """
+        if not self.excel_manager.archivo_cargado():
+            return
+
+        try:
+            # Accede a la hoja "Área" en el archivo Excel
+            if "Área" in self.excel_manager.workbook.sheetnames:
+                area_sheet = self.excel_manager.workbook["Área"]
+
+                # Leer datos de la primera fila de la hoja
+                tipo_geometria = area_sheet.cell(row=2, column=1).value
+                puntos_str = area_sheet.cell(row=2, column=2).value
+
+                if tipo_geometria and puntos_str:
+                    # Convertir los puntos desde el string al formato adecuado
+                    puntos = eval(puntos_str)
+                    self.validar_puntos(puntos)
+                    self.geometry_type = tipo_geometria
+                    self.points = puntos
+
+                    # Dibuja la figura cargada
+                    self.dibujar_figura(tipo_geometria, puntos)
+                    self.figura_desde_excel = True
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudieron cargar los datos del área: {e}")
+
+    def validar_puntos(self, puntos):
+        """
+        Valida que los puntos tengan el formato adecuado.
+
+        :param puntos: Lista de puntos a validar.
+        :raises ValueError: Si los puntos no tienen el formato esperado.
+        """
+        if not isinstance(puntos, list) or not all(isinstance(p, tuple) and len(p) == 2 for p in puntos):
+            raise ValueError("Los puntos no tienen el formato esperado. Deben ser una lista de tuplas (x, y).")

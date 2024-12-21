@@ -27,11 +27,115 @@ class UIManager:
         """
         Configura e inicia la ventana principal.
         """
-        self.root.title("DesingSPT")
-        self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight() - 80}")
-        self.root.iconbitmap('icon.ico')
+        # Configurar la ventana principal
+        self.configurar_ventana()
+
+        # Configurar el frame principal y las columnas/filas
+        self.configurar_main_frame()
+
+        # Menús
         self.crear_menus()
+
+        # Arrancar el bucle principal
         self.root.mainloop()
+
+    def configurar_ventana(self):
+        """
+        Configura las propiedades de la ventana principal.
+        """
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight() - 80
+        self.root.geometry(f"{screen_width}x{screen_height}")
+        self.root.iconbitmap('icon.ico')
+
+    def configurar_main_frame(self):
+        """
+        Configura el frame principal con columnas y filas ajustables.
+        """
+        # Crear un Frame principal
+        self.main_frame = tk.Frame(self.root)
+        self.main_frame.pack(fill="both", expand=True)
+
+        # Configurar columnas
+        self.main_frame.grid_columnconfigure(0, weight=1)  # Columna 1
+        self.main_frame.grid_columnconfigure(1, weight=4)  # Columna 2
+        self.main_frame.grid_columnconfigure(5, weight=1)  # Columna 3
+
+        # Configurar filas
+        self.main_frame.grid_rowconfigure(0, weight=1)  # Fila 0
+
+        # Crear frames para cada columna
+        self.columna_1 = tk.Frame(self.main_frame)
+        self.columna_1.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+
+        self.columna_2 = tk.Frame(self.main_frame)
+        self.columna_2.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
+
+        self.columna_3 = tk.Frame(self.main_frame)
+        self.columna_3.grid(row=0, column=5, padx=5, pady=5, sticky="nsew")
+
+        # Canvas dentro de la columna 2
+        self.configurar_canvas_columna_2()
+
+        # Agregar frames adicionales
+        self.configurar_informacion_proyecto(self.columna_1)
+        self.configurar_objetivos(self.columna_1)
+
+    def configurar_informacion_proyecto(self, parent_frame):
+        """
+        Configura el frame de información del proyecto.
+        """
+        info_frame = tk.LabelFrame(parent_frame, text="Información del Proyecto", pady=5, padx=5, font=("Arial", 14))
+        info_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=2, sticky="w")
+
+        # Título del Proyecto
+        tk.Label(info_frame, text="Título del proyecto: ", font=("Arial", 12)).grid(row=0, column=0, sticky="e", pady=5)
+        self.titulo_proyecto_val = tk.Label(info_frame, text="Proyecto 1", font=("Arial", 12))
+        self.titulo_proyecto_val.grid(row=0, column=1, sticky="w")
+
+        # Tensión Primario
+        tk.Label(info_frame, text="Tensión Primario: ", font=("Arial", 12)).grid(row=1, column=0, sticky="e", pady=5)
+        self.tension_primario_val = tk.Label(info_frame, text="", font=("Arial", 12))
+        self.tension_primario_val.grid(row=1, column=1, sticky="w")
+
+        # Tensión Secundario
+        tk.Label(info_frame, text="Tensión Secundario: ", font=("Arial", 12)).grid(row=2, column=0, sticky="e", pady=5)
+        self.tension_secundario_val = tk.Label(info_frame, text="", font=("Arial", 12))
+        self.tension_secundario_val.grid(row=2, column=1, sticky="w")
+
+        # Potencia Nominal
+        tk.Label(info_frame, text="Potencia Nominal:", font=("Arial", 12)).grid(row=3, column=0, sticky="e", pady=5)
+        self.potencia_nominal_val = tk.Label(info_frame, text="", font=("Arial", 12))
+        self.potencia_nominal_val.grid(row=3, column=1, sticky="w")
+
+    def configurar_objetivos(self, parent_frame):
+        """
+        Configura el frame de objetivos.
+        """
+        objetivo_frame = tk.LabelFrame(parent_frame, text="Objetivos", pady=6, padx=5, font=("Arial", 14))
+        objetivo_frame.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+
+        # Crear etiquetas y checkboxes dinámicamente
+        self.objetivos = []
+        for i in range(1, 14):  # Objetivos del 1 al 13
+            tk.Label(objetivo_frame, text=f"Objetivo {i}:", font=("Arial", 12)).grid(row=i - 1, column=0, sticky="e",
+                                                                                     pady=5)
+            objetivo_var = tk.BooleanVar(value=False)
+            objetivo_checkbox = tk.Checkbutton(objetivo_frame, variable=objetivo_var, state="disabled")
+            objetivo_checkbox.grid(row=i - 1, column=1, sticky="w")
+            self.objetivos.append(objetivo_var)
+
+    def configurar_canvas_columna_2(self):
+        """
+        Configura el canvas dentro de la columna 2.
+        """
+        # Frame para el canvas
+        canvas_frame = tk.Frame(self.columna_2, pady=5, padx=5)
+        canvas_frame.grid(row=0, column=0, padx=5, pady=5, rowspan=7, columnspan=2, sticky="nsew")
+
+        # Agregar el canvas
+        self.canvas = tk.Canvas(canvas_frame, bg="lightgray")
+        self.canvas.pack(fill="both", expand=True)  # Asegura que el canvas ocupe todo el espacio
 
     def crear_menus(self):
         """
@@ -49,11 +153,10 @@ class UIManager:
         archivo_menu.add_command(label="Salir", command=self.root.quit)
         menu_bar.add_cascade(label="Archivo", menu=archivo_menu)
 
-        # Menú Proyecto
+        # Menú Transformador
         proyecto_menu = Menu(menu_bar, tearoff=0)
-        proyecto_menu.add_command(label="Datos del Proyecto", command=self.abrir_datos_proyecto)
         proyecto_menu.add_command(label="Datos del Transformador", command=self.abrir_datos_transformador)
-        menu_bar.add_cascade(label="Proyecto", menu=proyecto_menu)
+        menu_bar.add_cascade(label="Transformador", menu=proyecto_menu)
 
         # Menú Geometría
         geometria_menu = Menu(menu_bar, tearoff=0)
@@ -90,13 +193,6 @@ class UIManager:
         self.excel_manager.crear_nuevo_archivo()
         self.actualizar_datos_principal()
 
-    def abrir_datos_proyecto(self):
-        """
-        Abre la ventana para gestionar datos del proyecto.
-        """
-        # Esta funcionalidad ya está implementada en el archivo original
-        messagebox.showinfo("Info", "Funcionalidad: Datos del Proyecto (implementada en transformer_manager.py)")
-
     def abrir_datos_transformador(self):
         """
         Abre la ventana para gestionar datos del transformador.
@@ -129,3 +225,9 @@ class UIManager:
 
         except Exception as e:
             print(f"Error al actualizar datos: {e}")
+
+    def abrir_ventana_geometria(self):
+        """
+        Abre la ventana de geometría definida utilizando GeometryManager.
+        """
+        self.geometry_manager.abrir_ventana_geometria(self.root)

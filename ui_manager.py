@@ -81,6 +81,11 @@ class UIManager:
         self.configurar_informacion_proyecto(self.columna_1)
         self.configurar_objetivos(self.columna_1)
 
+        # Configurar frames dentro de Columna 3
+        self.configurar_frame_resistencia(self.columna_3)
+        self.configurar_frame_seguridad(self.columna_3)
+        self.configurar_frame_sugerencias(self.columna_3)
+
     def configurar_informacion_proyecto(self, parent_frame):
         """
         Configura el frame de información del proyecto.
@@ -168,6 +173,13 @@ class UIManager:
         resistividad_menu.add_command(label="Datos de Resistividad", command=self.resistivity_manager.abrir_datos_resistencia)
         menu_bar.add_cascade(label="Resistividad", menu=resistividad_menu)
 
+        # Menú Reportes
+        reportes_menu = Menu(menu_bar, tearoff=0)
+        reportes_menu.add_command(label="Reporte de Transformador", command=self.mostrar_info)
+        reportes_menu.add_command(label="Reporte de Resistividad", command=self.mostrar_info)
+        reportes_menu.add_command(label="Reporte de Geometria", command=self.mostrar_info)
+        menu_bar.add_cascade(label="Reportes", menu=reportes_menu)
+
         # Menú Ayuda
         ayuda_menu = Menu(menu_bar, tearoff=0)
         ayuda_menu.add_command(label="Acerca de", command=self.mostrar_info)
@@ -231,3 +243,61 @@ class UIManager:
         Abre la ventana de geometría definida utilizando GeometryManager.
         """
         self.geometry_manager.abrir_ventana_geometria(self.root)
+
+    def configurar_frame_resistencia(self, parent_frame):
+        """
+        Configura el Frame de Resistencia dentro de la columna 3.
+        """
+        resistencia_frame = tk.LabelFrame(parent_frame, text="Resistencia", pady=5, padx=5, font=("Arial", 14))
+        resistencia_frame.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+
+        # Campos dentro del Frame Resistencia
+        tk.Label(resistencia_frame, text="Profundidad:", font=("Arial", 12)).grid(row=0, column=0, pady=5, sticky="e")
+        profundidad_spinbox = tk.Spinbox(resistencia_frame, from_=0.5, to=1.5, increment=0.1, width=5)
+        profundidad_spinbox.grid(row=0, column=1, sticky="w")
+        profundidad_spinbox.delete(0, "end")
+        profundidad_spinbox.insert(0, "0.5")  # Valor por defecto
+
+        tk.Label(resistencia_frame, text="Resistividad:", font=("Arial", 12)).grid(row=1, column=0, sticky="e", pady=5)
+        lista_resistividad = ttk.Combobox(resistencia_frame, state="readonly", width=15)
+        lista_resistividad.grid(row=1, column=1, sticky="w")
+        lista_resistividad.bind("<<ComboboxSelected>>", self.actualizar_resistividad_seleccionada)
+
+        tk.Label(resistencia_frame, text="Resistencia Malla:", font=("Arial", 12)).grid(row=2, column=0, sticky="e", pady=5)
+        tk.Entry(resistencia_frame).grid(row=2, column=1, sticky="w")
+
+    def actualizar_resistividad_seleccionada(self, event=None):
+        """
+        Actualiza la resistividad seleccionada en el combobox del Frame Resistencia.
+        """
+        resistividad = event.widget.get()
+        messagebox.showinfo("Resistividad Seleccionada", f"Has seleccionado: {resistividad}")
+
+    def configurar_frame_seguridad(self, parent_frame):
+        """
+        Configura el Frame de Seguridad dentro de la columna 3.
+        """
+        seguridad_frame = tk.LabelFrame(parent_frame, text="Seguridad", pady=5, padx=5, font=("Arial", 14))
+        seguridad_frame.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+
+        # Campos dentro del Frame Seguridad
+        tk.Label(seguridad_frame, text="GPR:", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
+        tk.Entry(seguridad_frame).grid(row=0, column=1, sticky="w", pady=5)
+        tk.Label(seguridad_frame, text="Tensión de paso:", font=("Arial", 12)).grid(row=1, column=0, sticky="e")
+        tk.Entry(seguridad_frame).grid(row=1, column=1, sticky="w", pady=5)
+        tk.Label(seguridad_frame, text="Tensión de toque:", font=("Arial", 12)).grid(row=2, column=0, sticky="e")
+        tk.Entry(seguridad_frame).grid(row=2, column=1, sticky="w", pady=5)
+
+    def configurar_frame_sugerencias(self, parent_frame):
+        """
+        Configura el Frame de Sugerencias dentro de la columna 3.
+        """
+        default_frame = tk.LabelFrame(parent_frame, text="Sugerencias", pady=5, padx=5, font=("Arial", 14))
+        default_frame.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+
+        # Campo dentro del Frame Default
+        tk.Label(default_frame, text="Texto sugerencia:", font=("Arial", 12)).grid(row=0, column=0, sticky="e")
+        tk.Label(default_frame, text="Este es un texto no editable.").grid(row=0, column=1, sticky="w", pady=5)
+
+
+

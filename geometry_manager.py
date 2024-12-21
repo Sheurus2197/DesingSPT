@@ -74,7 +74,12 @@ class GeometryManager:
         Cambia la geometría actual y redibuja en el canvas.
         """
         self.geometry_type = nueva_geometria
-        self.points = self.obtener_dimensiones_predeterminadas(nueva_geometria)
+
+        # Obtener dimensiones predeterminadas y convertir a puntos
+        dimensiones = self.obtener_dimensiones_predeterminadas(nueva_geometria)
+        self.points = self.convertir_a_puntos(dimensiones, nueva_geometria)
+
+        # Dibujar la nueva figura
         self.dibujar_figura(nueva_geometria, self.points)
 
     def obtener_dimensiones_predeterminadas(self, tipo):
@@ -93,37 +98,30 @@ class GeometryManager:
         }
         return dimensiones.get(tipo, [])
 
-    def dibujar_figura(self, tipo, dimensiones):
+    def dibujar_figura(self, tipo, puntos):
         """
-        Dibuja una figura en el canvas según su tipo y dimensiones.
+        Dibuja una figura en el canvas según su tipo y puntos.
 
         :param tipo: Tipo de figura.
-        :param dimensiones: Dimensiones necesarias para la figura.
+        :param puntos: Lista de puntos (tuplas) necesarios para la figura.
         """
-        global points
         self.canvas.delete("all")  # Limpiar canvas
 
-        if tipo == "L":
-            vertical, horizontal = dimensiones
-            points = [(50, 50), (50, 50 + vertical), (50 + horizontal, 50 + vertical)]
-        elif tipo == "Rectángulo":
-            base, altura = dimensiones
-            points = [(50, 50), (50 + base, 50), (50 + base, 50 + altura), (50, 50 + altura)]
-        elif tipo == "Triángulo":
-            lado1, lado2, lado3 = dimensiones
-            points = [(50, 50), (50 + lado1, 50), (50, 50 + lado2)]
-        elif tipo == "Línea":
-            longitud = dimensiones[0]
-            points = [(50, 100), (50 + longitud, 100)]
-        elif tipo == "Circunferencia":
-            diametro = dimensiones[0]
-            self.dibujar_circunferencia(diametro)
+        # Validar que los puntos estén en el formato adecuado
+        if not puntos or not all(isinstance(p, tuple) and len(p) == 2 for p in puntos):
+            messagebox.showerror("Error", "Formato de puntos inválido. Deben ser una lista de tuplas (x, y).")
             return
 
-        # Dibujar los segmentos
-        for i, (x1, y1) in enumerate(points):
-            x2, y2 = points[(i + 1) % len(points)]
+        # Dibujar segmentos o figuras cerradas
+        for i, (x1, y1) in enumerate(puntos):
+            x2, y2 = puntos[(i + 1) % len(puntos)]  # Conexión cíclica para figuras cerradas
             self.canvas.create_line(x1, y1, x2, y2, fill="blue", width=2)
+
+        # Si es una circunferencia, dibujar específicamente
+        if tipo == "Circunferencia":
+            x1, y1 = puntos[0]
+            x2, y2 = puntos[1]
+            self.canvas.create_oval(x1, y1, x2, y2, outline="blue", width=2)
 
     def dibujar_circunferencia(self, diametro):
         """
@@ -300,7 +298,11 @@ class GeometryManager:
                 if tipo_geometria and puntos_str:
                     # Convertir los puntos desde el string al formato adecuado
                     puntos = eval(puntos_str)
-                    self.validar_puntos(puntos)
+
+                    # Validar y ajustar formato de puntos si es necesario
+                    if not isinstance(puntos[0], tuple):  # Si no son tuplas, adaptarlos
+                        puntos = self.convertir_a_puntos(puntos, tipo_geometria)
+
                     self.geometry_type = tipo_geometria
                     self.points = puntos
 
@@ -309,6 +311,38 @@ class GeometryManager:
                     self.figura_desde_excel = True
         except Exception as e:
             messagebox.showerror("Error", f"No se pudieron cargar los datos del área: {e}")
+
+    def convertir_a_puntos(self, valores, tipo_geometria):
+        """
+        Convierte una lista de valores individuales a un formato de puntos adecuado según el tipo de geometría.
+
+        :param valores: Lista de valores individuales.
+        :param tipo_geometria: Tipo de geometría ('Rectángulo', 'L', etc.).
+        :return: Lista de puntos (tuplas).
+        """
+        if tipo_geometria == "Rectángulo":
+            # Asumimos [base, altura]
+            base, altura = valores
+            return [(50, 50), (50 + base, 50), (50 + base, 50 + altura), (50, 50 + altura)]
+        elif tipo_geometria == "L":
+            # Asumimos [vertical, horizontal]
+            vertical, horizontal = valores
+            return [(50, 50), (50, 50 + vertical), (50 + horizontal, 50 + vertical)]
+        elif tipo_geometria == "Línea":
+            # Asumimos [longitud]
+            longitud = valores[0]
+            return [(50, 100), (50 + longitud, 100)]
+        elif tipo_geometria == "Triángulo":
+            # Asumimos [lado1, lado2, lado3]
+            lado1, lado2, _ = valores
+            return [(50, 50), (50 + lado1, 50), (50, 50 + lado2)]
+        elif tipo_geometria == "Circunferencia":
+            # Asumimos [diámetro]
+            diametro = valores[0]
+            radio = diametro / 2
+            return [(200 - radio, 200 - radio), (200 + radio, 200 + radio)]
+        else:
+            raise ValueError("Tipo de geometría no reconocido.")
 
     def validar_puntos(self, puntos):
         """
